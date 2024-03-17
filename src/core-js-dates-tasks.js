@@ -80,9 +80,11 @@ function getNextFriday(date) {
   const nextFriday = new Date(date.getTime());
   nextFriday.setDate(date.getDate() + daysUntilFriday);
 
-  const formattedDate = nextFriday.toISOString();
+  if (currentDay === 5) {
+    nextFriday.setDate(nextFriday.getDate() + 7);
+  }
 
-  return formattedDate;
+  return nextFriday;
 }
 
 /**
@@ -160,9 +162,10 @@ function formatDate(date) {
     day: 'numeric',
     year: 'numeric',
     hour: 'numeric',
-    minute: 'numeric',
-    second: 'numeric',
+    minute: '2-digit',
+    second: '2-digit',
     hour12: true,
+    timeZone: 'UTC',
   });
   return formattedDate;
 }
@@ -207,15 +210,13 @@ function getCountWeekendsInMonth(month, year) {
  * Date(2024, 1, 23) => 8
  */
 function getWeekNumberByDate(date) {
-  const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
-  const daysOffset = (firstDayOfYear.getDay() + 6) % 7;
-  const firstMondayOfYear = new Date(firstDayOfYear);
-  firstMondayOfYear.setDate(firstMondayOfYear.getDate() + (8 - daysOffset));
+  const currentDate = new Date(date);
+  const startOfYear = new Date(currentDate.getFullYear(), 0, 1);
+  const timeInDay = 1000 * 60 * 60 * 24;
 
-  const diff = date - firstMondayOfYear;
-  const oneWeekInMilliseconds = 1000 * 60 * 60 * 24 * 7;
-  const weekNumber = Math.floor(diff / oneWeekInMilliseconds) + 1;
-
+  const weekNumber = Math.ceil(
+    ((currentDate - startOfYear) / timeInDay + startOfYear.getDay() + 1) / 7
+  );
   return weekNumber;
 }
 
